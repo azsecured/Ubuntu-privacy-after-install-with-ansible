@@ -20,7 +20,7 @@
       loop:
         - lxd
         - core18
-	- core20
+        - core20
         - snapd
     - name: Stop snapd service
       service:
