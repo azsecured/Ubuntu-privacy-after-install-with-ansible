@@ -1,0 +1,43 @@
+---
+- hosts: all
+  remote_user: sudouser
+  become: yes
+  become_user: root
+  tasks:
+    - name: Copy apport file
+      copy:
+        src: config/apport
+        dest: /etc/default/apport
+    - name: Stop apport service
+      service:
+        name: apport
+        state: stopped
+        enabled: no
+    - name: Remove snap packages
+      snap:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - lxd
+        - core18
+	- core20
+        - snapd
+    - name: Stop snapd service
+      service:
+        name: snapd
+        state: stopped
+        enabled: no
+    - name: Disable autoupdate service
+      service:
+        name: unattended-upgrades
+        state: stopped
+        enabled: no
+    - name: Create file for disable Cloud-init service
+      file:
+        path: "/etc/cloud/cloud-init.disabled"
+        state: touch
+    - name: Disable Cloud-init service
+      service:
+        name: cloud-init
+        state: stopped
+        enabled: no
